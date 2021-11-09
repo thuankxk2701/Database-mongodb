@@ -1,68 +1,41 @@
 "use strict";
-
 const SingleFile = require("../models/singleFile");
 
-const getAllTasks = async (req, res) => {
+const singleFileUpload = async (req, res, next) => {
   try {
-    const taskSingleFiles = await SingleFile.find({});
-    res.status(200).json({ taskSingleFiles });
+    const file = new SingleFile({
+      fileName: req.file.originalname,
+      filePath: req.file.path,
+      fileType: req.file.mimetype,
+      fileSize: fileSizeFormatter(req.file.size, 2),
+    });
+
+    await file.save();
+    res.status(201).send("File Uploaded Successfully");
   } catch (error) {
-    res.status(500).json({ msg: error });
+    return res.status(400).send(error.message);
   }
 };
-const createTask = async (req, res) => {
+const getSingleFiles = async (req, res, next) => {
   try {
-    const taskSingleFile = await SingleFile.create(req.body);
-    res.status(201).json({ taskSingleFile });
+    const files = await SingleFile.find();
+    res.status(200).send(files);
   } catch (error) {
-    res.status(500).json({ msg: error });
-  }
-};
-const getTask = async (req, res) => {
-  try {
-    const { id: taskSingleFileID } = req.params;
-    const taskSingleFile = await SingleFile.findOne({ _id: taskSingleFileID });
-    if (!taskSingleFile) {
-      return req.status(404).json({ msg: `No task with id:${taskSingleFileID}` });
-    }
-    res.status(200).json({ taskSingleFile });
-  } catch (error) {
-    res.status(500).json({ msg: error });
-  }
-};
-const deleteTask = async (req, res) => {
-  try {
-    const { id: taskSingleFileID } = req.params;
-    const taskSingleFile = await SingleFile.findOneAndDelete({ _id: taskSingleFileID });
-    if (!task) {
-      return req.status(404).json({ msg: `No task with id:${taskSingleFileID}` });
-    }
-    res.status(200).json({ taskSingleFile });
-  } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(400).send(error.message);
   }
 };
 
-const updateTask = async (req, res) => {
-  try {
-    const { id: taskSingleFileID } = req.params;
-    const taskSingleFile = await SingleFile.findOneAndUpdate({ _id: taskSingleFileID }, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!task) {
-      return req.status(404).json({ msg: `No task with id:${taskSingleFileID}` });
-    }
-    res.status(200).json({ taskSingleFile });
-  } catch (error) {
-    res.status(500).json({ msg: error });
+const fileSizeFormatter = (bytes, decimal) => {
+  if (bytes === 0) {
+    return "0 Bytes";
   }
+  const dm = decimal || 2;
+  const sizes = ["Bytes", "KB", "MB", "TB", "PB", "EB", "YB", "ZB"];
+  const index = Math.floor(Math.log(bytes) / Math.log(1000));
+  return parseFloat((bytes / Math.pow(1000, index)).toFixed(dm)) + " " + sizes[index];
 };
 
 module.exports = {
-  getAllTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-  getTask,
+  singleFileUpload,
+  getSingleFiles,
 };

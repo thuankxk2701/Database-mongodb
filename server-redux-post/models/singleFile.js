@@ -19,16 +19,6 @@ const singleFileSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    title: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    body: {
-      type: String,
-      trim: true,
-      required: true,
-    },
   },
   { timestamps: true },
 );

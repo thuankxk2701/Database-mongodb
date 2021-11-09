@@ -1,16 +1,12 @@
 "use strict";
 
 const express = require("express");
+const { upload } = require("../helpers/fileHelpers");
+const { singleFileUpload, getSingleFiles } = require("../controllers/fileUploadedControllers");
+
 const router = express.Router();
 
-const {
-  getAllTasks,
-  createTask,
-  getTask,
-  updateTask,
-  deleteTask,
-} = require("../controllers/fileUploadedControllers");
+router.post("/singleFile", upload.single("file"), singleFileUpload);
+router.get("/getSingleFiles", getSingleFiles);
 
-router.route("/").get(getAllTasks).post(createTask);
-router.route("/:id").get(getTask).patch(updateTask).delete(deleteTask);
 module.exports = router;
