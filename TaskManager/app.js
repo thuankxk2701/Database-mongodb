@@ -1,4 +1,6 @@
+// "use strict";
 const express = require("express");
+const cors = require("cors");
 require("dotenv").config();
 app = express();
 const tasks = require("./routers/tasks");
@@ -6,10 +8,11 @@ const connectDB = require("./db/connect");
 const notFound = require("./middleware/notFound");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 const PORT = process.env.PORT || 5000;
+app.use(cors());
 //Middleware
 
 app.use(express.static("./public"));
-app.use(express.json);
+app.use(express.json());
 // router
 
 app.use("/api/v1/tasks", tasks);
